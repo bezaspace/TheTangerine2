@@ -21,3 +21,12 @@ export interface GeminiError {
   code?: string;
   status?: number;
 }
+
+// Enhanced response type for function calling
+export interface GeminiFunctionResponse extends GeminiResponse {
+  functionCalls?: Array<{
+    name: string;
+    args: Record<string, any>;
+  }>;
+  functionResults?: any[];
+}

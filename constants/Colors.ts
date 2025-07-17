@@ -28,7 +28,9 @@ export const Colors = {
   
   // Status Colors (minimal use)
   success: '#4ADE80',              // Green for success states
+  successLight: '#22C55E20',       // Light green background
   error: '#EF4444',                // Red for error states
+  errorLight: '#EF444420',         // Light red background
   warning: '#F59E0B',              // Yellow for warning states
   
   // Tab Bar

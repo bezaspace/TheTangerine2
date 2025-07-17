@@ -1,16 +1,14 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   SafeAreaView,
   Alert,
   RefreshControl,
 } from 'react-native';
-import { ChatMessage } from '@/components/chat/ChatMessage';
+import { StreamingChatView } from '@/components/chat/StreamingChatView';
 import { ChatInput } from '@/components/chat/ChatInput';
-import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { useChat } from '@/hooks/useChat';
 import { ChatMessage as ChatMessageType } from '@/types/chat';
 import Colors from '@/constants/Colors';
@@ -20,21 +18,14 @@ export default function ChatScreen() {
     currentSession,
     isLoading,
     error,
-    sendMessage,
+    sendMessageWithStreaming,
     clearError,
     refresh,
   } = useChat();
 
-  const flatListRef = useRef<FlatList>(null);
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    if (currentSession?.messages.length) {
-      setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
-      }, 100);
-    }
-  }, [currentSession?.messages.length]);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingText, setStreamingText] = useState('');
+  const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Show error alerts
   useEffect(() => {
@@ -53,12 +44,57 @@ export default function ChatScreen() {
   }, [error, clearError]);
 
   const handleSendMessage = async (message: string) => {
-    await sendMessage(message, false); // Set to true for streaming
+    setIsStreaming(true);
+    setStreamingText('');
+    
+    try {
+      await sendMessageWithStreaming(
+        message,
+        (chunk: string, fullText: string) => {
+          console.log('Streaming chunk:', chunk.length, 'chars, Full text:', fullText.length, 'chars');
+          
+          // Clear any existing timeout
+          if (streamingTimeoutRef.current) {
+            clearTimeout(streamingTimeoutRef.current);
+          }
+          
+          // Update immediately for smooth streaming
+          setStreamingText(fullText);
+        },
+        { enableFunctionCalling: true }
+      );
+    } finally {
+      // Use React.startTransition to ensure smooth state updates
+      React.startTransition(() => {
+        setIsStreaming(false);
+        setStreamingText('');
+      });
+    }
   };
 
-  const renderMessage = ({ item }: { item: ChatMessageType }) => (
-    <ChatMessage message={item} />
-  );
+  const handlePractitionerPress = (practitioner: any) => {
+    // Handle practitioner selection - could navigate to practitioner details
+    console.log('Practitioner selected:', practitioner);
+  };
+
+  const handleBookPress = (practitioner: any) => {
+    // Handle booking request - could open booking interface
+    console.log('Book appointment with:', practitioner);
+    Alert.alert(
+      'Book Appointment',
+      `Would you like to book an appointment with ${practitioner.name}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Book Now', 
+          onPress: () => {
+            // For now, just send a message to the chat
+            handleSendMessage(`I want to book an appointment with ${practitioner.name}`);
+          }
+        },
+      ]
+    );
+  };
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
@@ -100,33 +136,23 @@ export default function ChatScreen() {
     <SafeAreaView style={styles.container}>
       {renderHeader()}
       
-      <FlatList
-        ref={flatListRef}
-        data={currentSession.messages}
-        renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
-        style={styles.messagesList}
-        contentContainerStyle={[
-          styles.messagesContainer,
-          currentSession.messages.length === 0 && styles.emptyContainer,
-        ]}
-        ListEmptyComponent={renderEmptyState}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            onRefresh={refresh}
-            tintColor={Colors.primary}
-            colors={[Colors.primary]}
-          />
-        }
-      />
-
-      <TypingIndicator visible={isLoading} />
+      {currentSession.messages.length === 0 ? (
+        <View style={[styles.messagesList, styles.emptyContainer]}>
+          {renderEmptyState()}
+        </View>
+      ) : (
+        <StreamingChatView
+          messages={currentSession.messages}
+          isStreaming={isStreaming}
+          streamingText={streamingText}
+          onPractitionerPress={handlePractitionerPress}
+          onBookPress={handleBookPress}
+        />
+      )}
       
       <ChatInput
         onSendMessage={handleSendMessage}
-        disabled={isLoading}
+        disabled={isLoading || isStreaming}
       />
     </SafeAreaView>
   );

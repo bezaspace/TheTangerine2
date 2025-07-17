@@ -4,6 +4,13 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   timestamp: Date;
   isStreaming?: boolean;
+  // Function calling properties
+  functionCalls?: Array<{
+    name: string;
+    args: Record<string, any>;
+  }>;
+  functionResults?: any[];
+  displayType?: 'text' | 'practitioner-suggestions' | 'practitioner-recommendations' | 'booking-confirmation' | 'availability-check';
 }
 
 export interface ChatSession {
@@ -23,4 +30,5 @@ export interface ChatState {
 export interface SendMessageOptions {
   content: string;
   streaming?: boolean;
+  enableFunctionCalling?: boolean;
 }
