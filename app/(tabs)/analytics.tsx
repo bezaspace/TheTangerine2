@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
 import { Activity, Heart, Utensils, Pill, Dumbbell, Brain, TrendingUp, Calendar, Clock } from 'lucide-react-native';
+import Colors from '@/constants/Colors';
 
 const { width } = Dimensions.get('window');
 
@@ -42,7 +43,7 @@ export default function AnalyticsScreen() {
       <View style={styles.metricHeader}>
         <Text style={styles.metricTitle}>{key.charAt(0).toUpperCase() + key.slice(1)}</Text>
         <View style={[styles.trendIndicator, metric.trend === 'up' ? styles.trendUp : styles.trendDown]}>
-          <TrendingUp size={12} color={metric.trend === 'up' ? '#87A96B' : '#FF8C42'} />
+          <TrendingUp size={12} color={metric.trend === 'up' ? Colors.success : Colors.primary} />
         </View>
       </View>
       <Text style={styles.metricValue}>{metric.current} {metric.unit}</Text>
@@ -120,7 +121,7 @@ export default function AnalyticsScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Pill size={20} color="#FF8C42" />
+            <Pill size={20} color={Colors.primary} />
             <Text style={styles.sectionTitle}>Today's Medications</Text>
           </View>
           
@@ -129,7 +130,7 @@ export default function AnalyticsScreen() {
               <View style={styles.medicationInfo}>
                 <Text style={styles.medicationName}>{med.name}</Text>
                 <View style={styles.medicationDetails}>
-                  <Clock size={14} color="#6B7280" />
+                  <Clock size={14} color={Colors.textSecondary} />
                   <Text style={styles.medicationTime}>{med.time}</Text>
                   <View style={[styles.medicationType, med.type === 'supplement' && styles.supplementType]}>
                     <Text style={styles.medicationTypeText}>{med.type}</Text>
@@ -147,7 +148,7 @@ export default function AnalyticsScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Utensils size={20} color="#FF8C42" />
+            <Utensils size={20} color={Colors.primary} />
             <Text style={styles.sectionTitle}>Today's Diet Log</Text>
           </View>
           
@@ -174,7 +175,7 @@ export default function AnalyticsScreen() {
 
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Brain size={20} color="#FF8C42" />
+            <Brain size={20} color={Colors.primary} />
             <Text style={styles.sectionTitle}>Wellness Insights</Text>
           </View>
           
@@ -200,7 +201,7 @@ export default function AnalyticsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -209,24 +210,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   periodSelector: {
@@ -239,23 +240,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     marginRight: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: Colors.border,
   },
   activePeriodButton: {
-    backgroundColor: '#FF8C42',
-    borderColor: '#FF8C42',
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   periodText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   activePeriodText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   metricsGrid: {
     flexDirection: 'row',
@@ -265,16 +266,18 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     width: (width - 52) / 2,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     borderRadius: 12,
     padding: 16,
     marginRight: 12,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   metricHeader: {
     flexDirection: 'row',
@@ -285,56 +288,58 @@ const styles = StyleSheet.create({
   metricTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   trendIndicator: {
     padding: 4,
     borderRadius: 12,
   },
   trendUp: {
-    backgroundColor: '#F0F9FF',
+    backgroundColor: Colors.backgroundSecondary,
   },
   trendDown: {
-    backgroundColor: '#FFF7F0',
+    backgroundColor: Colors.backgroundSecondary,
   },
   metricValue: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   metricTarget: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: Colors.textMuted,
     marginBottom: 8,
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Colors.border,
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.primary,
     borderRadius: 2,
   },
   chartContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   chartTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 16,
   },
   chart: {
@@ -360,17 +365,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   meditationBar: {
-    backgroundColor: '#87A96B',
+    backgroundColor: Colors.success,
   },
   yogaBar: {
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.primary,
   },
   workoutBar: {
     backgroundColor: '#3B82F6',
   },
   chartDayLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   chartLegend: {
@@ -390,7 +395,7 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   section: {
     paddingHorizontal: 20,
@@ -404,22 +409,24 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginLeft: 8,
   },
   medicationItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   medicationInfo: {
     flex: 1,
@@ -427,7 +434,7 @@ const styles = StyleSheet.create({
   medicationName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   medicationDetails: {
@@ -436,51 +443,53 @@ const styles = StyleSheet.create({
   },
   medicationTime: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginLeft: 4,
     marginRight: 8,
   },
   medicationType: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: Colors.backgroundSecondary,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
   },
   supplementType: {
-    backgroundColor: '#FFF7F0',
+    backgroundColor: Colors.backgroundSecondary,
   },
   medicationTypeText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     fontWeight: '500',
   },
   medicationStatus: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: '#FEF3C7',
+    backgroundColor: Colors.warning,
   },
   medicationTaken: {
-    backgroundColor: '#D1FAE5',
+    backgroundColor: Colors.success,
   },
   statusText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#D97706',
+    color: Colors.textInverse,
   },
   takenText: {
-    color: '#059669',
+    color: Colors.textInverse,
   },
   dietItem: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   dietHeader: {
     flexDirection: 'row',
@@ -491,68 +500,72 @@ const styles = StyleSheet.create({
   mealName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
   },
   mealTime: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   mealItems: {
     marginBottom: 8,
   },
   mealItem: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginBottom: 2,
   },
   mealCalories: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF8C42',
+    color: Colors.primary,
   },
   caloriesSummary: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     padding: 16,
     borderRadius: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   caloriesTotal: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
   },
   caloriesTarget: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   insightCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#87A96B',
-    shadowColor: '#000',
+    borderLeftColor: Colors.primary,
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   insightTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 6,
   },
   insightText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
 });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Calendar, Clock, Utensils, Pill, Activity, User, CircleCheck as CheckCircle, Circle } from 'lucide-react-native';
+import Colors from '@/constants/Colors';
 
 const scheduleItems = [
   {
@@ -173,7 +174,7 @@ export default function ScheduleScreen() {
                 <View style={styles.timelineDot}>
                   <View style={[
                     styles.dot,
-                    { backgroundColor: item.completed ? item.color : '#E5E7EB' }
+                    { backgroundColor: item.completed ? item.color : Colors.border }
                   ]} />
                   {index < items.length - 1 && (
                     <View style={styles.timelineLine} />
@@ -223,7 +224,7 @@ export default function ScheduleScreen() {
                     {item.completed ? (
                       <CheckCircle size={24} color={item.color} />
                     ) : (
-                      <Circle size={24} color="#9CA3AF" />
+                      <Circle size={24} color={Colors.textMuted} />
                     )}
                   </TouchableOpacity>
                 </View>
@@ -239,7 +240,7 @@ export default function ScheduleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -248,24 +249,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginBottom: 20,
   },
   progressContainer: {
@@ -279,22 +280,22 @@ const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   progressPercentage: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FF8C42',
+    color: Colors.primary,
   },
   progressBar: {
     height: 6,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Colors.border,
     borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.primary,
     borderRadius: 3,
   },
   timeline: {
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -333,21 +334,23 @@ const styles = StyleSheet.create({
     top: 12,
     width: 2,
     height: 60,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Colors.border,
   },
   activityCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   completedCard: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: Colors.backgroundSecondary,
     opacity: 0.8,
   },
   cardHeader: {
@@ -380,12 +383,12 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     flex: 1,
   },
   completedText: {
     textDecorationLine: 'line-through',
-    color: '#9CA3AF',
+    color: Colors.textMuted,
   },
   typeBadge: {
     paddingHorizontal: 8,
@@ -400,11 +403,11 @@ const styles = StyleSheet.create({
   },
   activityDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 18,
   },
   completedDescription: {
-    color: '#9CA3AF',
+    color: Colors.textMuted,
   },
   checkButton: {
     padding: 4,

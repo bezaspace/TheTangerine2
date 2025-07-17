@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Calendar, Clock, MapPin, Phone, MessageCircle } from 'lucide-react-native';
+import Colors from '@/constants/Colors';
 
 const appointments = [
   {
@@ -91,17 +92,17 @@ export default function AppointmentsScreen() {
               
               <View style={styles.appointmentDetails}>
                 <View style={styles.detailRow}>
-                  <Calendar size={16} color="#6B7280" />
+                  <Calendar size={16} color={Colors.textSecondary} />
                   <Text style={styles.detailText}>{appointment.date}</Text>
                 </View>
                 
                 <View style={styles.detailRow}>
-                  <Clock size={16} color="#6B7280" />
+                  <Clock size={16} color={Colors.textSecondary} />
                   <Text style={styles.detailText}>{appointment.time}</Text>
                 </View>
                 
                 <View style={styles.detailRow}>
-                  <MapPin size={16} color="#6B7280" />
+                  <MapPin size={16} color={Colors.textSecondary} />
                   <Text style={styles.detailText}>{appointment.location}</Text>
                 </View>
               </View>
@@ -109,12 +110,12 @@ export default function AppointmentsScreen() {
               {appointment.status === 'upcoming' && (
                 <View style={styles.actionButtons}>
                   <TouchableOpacity style={styles.secondaryButton}>
-                    <Phone size={16} color="#FF8C42" />
+                    <Phone size={16} color={Colors.primary} />
                     <Text style={styles.secondaryButtonText}>Call</Text>
                   </TouchableOpacity>
                   
                   <TouchableOpacity style={styles.secondaryButton}>
-                    <MessageCircle size={16} color="#FF8C42" />
+                    <MessageCircle size={16} color={Colors.primary} />
                     <Text style={styles.secondaryButtonText}>Message</Text>
                   </TouchableOpacity>
                   
@@ -155,30 +156,30 @@ export default function AppointmentsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.background,
   },
   header: {
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   tabContainer: {
@@ -191,23 +192,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     marginRight: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: Colors.border,
   },
   activeTab: {
-    backgroundColor: '#FF8C42',
-    borderColor: '#FF8C42',
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   tabText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   activeTabText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   scrollView: {
     flex: 1,
@@ -217,15 +218,17 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   appointmentCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   appointmentHeader: {
     flexDirection: 'row',
@@ -236,7 +239,7 @@ const styles = StyleSheet.create({
   practitionerName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     flex: 1,
   },
   statusBadge: {
@@ -245,24 +248,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   upcomingBadge: {
-    backgroundColor: '#FFF7F0',
+    backgroundColor: Colors.backgroundSecondary,
   },
   completedBadge: {
-    backgroundColor: '#F0F9FF',
+    backgroundColor: Colors.backgroundSecondary,
   },
   statusText: {
     fontSize: 12,
     fontWeight: '500',
   },
   upcomingText: {
-    color: '#FF8C42',
+    color: Colors.primary,
   },
   completedText: {
-    color: '#3B82F6',
+    color: Colors.success,
   },
   specialty: {
     fontSize: 14,
-    color: '#87A96B',
+    color: Colors.primary,
     fontWeight: '500',
     marginBottom: 12,
   },
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginLeft: 8,
   },
   actionButtons: {
@@ -285,14 +288,14 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -300,16 +303,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF7F0',
+    backgroundColor: Colors.backgroundSecondary,
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#FF8C42',
+    borderColor: Colors.primary,
     minWidth: 80,
   },
   secondaryButtonText: {
-    color: '#FF8C42',
+    color: Colors.primary,
     fontSize: 14,
     fontWeight: '500',
     marginLeft: 4,
@@ -322,12 +325,12 @@ const styles = StyleSheet.create({
   emptyStateText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginBottom: 8,
   },
   emptyStateSubtext: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: Colors.textMuted,
     textAlign: 'center',
     lineHeight: 20,
   },

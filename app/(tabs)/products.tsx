@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import { ShoppingCart, Star, Heart } from 'lucide-react-native';
+import Colors from '@/constants/Colors';
 
 const products = [
   {
@@ -116,8 +117,8 @@ export default function ProductsScreen() {
                 >
                   <Heart 
                     size={20} 
-                    color={favorites.has(product.id) ? "#FF8C42" : "#6B7280"} 
-                    fill={favorites.has(product.id) ? "#FF8C42" : "none"}
+                    color={favorites.has(product.id) ? Colors.primary : Colors.textSecondary} 
+                    fill={favorites.has(product.id) ? Colors.primary : "none"}
                   />
                 </TouchableOpacity>
                 {!product.inStock && (
@@ -155,8 +156,8 @@ export default function ProductsScreen() {
                   disabled={!product.inStock || cart.has(product.id)}
                 >
                   <ShoppingCart size={16} color={
-                    !product.inStock ? "#9CA3AF" : 
-                    cart.has(product.id) ? "#87A96B" : "#FFFFFF"
+                    !product.inStock ? Colors.textMuted : 
+                    cart.has(product.id) ? Colors.success : Colors.textInverse
                   } />
                   <Text style={[
                     styles.addToCartText,
@@ -179,7 +180,7 @@ export default function ProductsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -188,24 +189,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   productsGrid: {
@@ -214,15 +215,17 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   productCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     borderRadius: 16,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   imageContainer: {
     position: 'relative',
@@ -237,26 +240,28 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     right: 12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     borderRadius: 20,
     padding: 8,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   outOfStockBadge: {
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: '#DC2626',
+    backgroundColor: Colors.error,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   outOfStockText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -265,7 +270,7 @@ const styles = StyleSheet.create({
   },
   category: {
     fontSize: 12,
-    color: '#87A96B',
+    color: Colors.primary,
     fontWeight: '600',
     textTransform: 'uppercase',
     marginBottom: 4,
@@ -273,12 +278,12 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 6,
   },
   productDescription: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 20,
     marginBottom: 8,
   },
@@ -289,14 +294,14 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: 14,
-    color: '#1F2937',
+    color: Colors.text,
     fontWeight: '500',
     marginLeft: 4,
     marginRight: 4,
   },
   reviews: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -306,40 +311,40 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FF8C42',
+    color: Colors.primary,
     marginRight: 8,
   },
   originalPrice: {
     fontSize: 16,
-    color: '#9CA3AF',
+    color: Colors.textMuted,
     textDecorationLine: 'line-through',
   },
   addToCartButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     borderRadius: 8,
   },
   disabledButton: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Colors.border,
   },
   addedToCartButton: {
-    backgroundColor: '#F0F9FF',
+    backgroundColor: Colors.backgroundSecondary,
     borderWidth: 1,
-    borderColor: '#87A96B',
+    borderColor: Colors.success,
   },
   addToCartText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,
   },
   disabledButtonText: {
-    color: '#9CA3AF',
+    color: Colors.textMuted,
   },
   addedToCartText: {
-    color: '#87A96B',
+    color: Colors.success,
   },
 });

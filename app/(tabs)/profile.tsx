@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { User, Mail, Phone, MapPin, Calendar, Settings, Bell, CircleHelp as HelpCircle, LogOut } from 'lucide-react-native';
+import Colors from '@/constants/Colors';
 
 const userData = {
   name: 'John Doe',
@@ -31,7 +32,7 @@ export default function ProfileScreen() {
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <User size={40} color="#FF8C42" />
+              <User size={40} color={Colors.primary} />
             </View>
           </View>
           
@@ -41,17 +42,17 @@ export default function ProfileScreen() {
             
             <View style={styles.contactInfo}>
               <View style={styles.contactRow}>
-                <Mail size={16} color="#6B7280" />
+                <Mail size={16} color={Colors.textSecondary} />
                 <Text style={styles.contactText}>{userData.email}</Text>
               </View>
               
               <View style={styles.contactRow}>
-                <Phone size={16} color="#6B7280" />
+                <Phone size={16} color={Colors.textSecondary} />
                 <Text style={styles.contactText}>{userData.phone}</Text>
               </View>
               
               <View style={styles.contactRow}>
-                <MapPin size={16} color="#6B7280" />
+                <MapPin size={16} color={Colors.textSecondary} />
                 <Text style={styles.contactText}>{userData.location}</Text>
               </View>
             </View>
@@ -82,7 +83,7 @@ export default function ProfileScreen() {
           {menuItems.map((item) => (
             <TouchableOpacity key={item.id} style={styles.menuItem}>
               <View style={styles.menuIconContainer}>
-                <item.icon size={20} color="#6B7280" />
+                <item.icon size={20} color={Colors.textSecondary} />
               </View>
               
               <View style={styles.menuItemContent}>
@@ -99,7 +100,7 @@ export default function ProfileScreen() {
 
         <View style={styles.logoutSection}>
           <TouchableOpacity style={styles.logoutButton}>
-            <LogOut size={20} color="#DC2626" />
+            <LogOut size={20} color={Colors.error} />
             <Text style={styles.logoutText}>Sign Out</Text>
           </TouchableOpacity>
         </View>
@@ -111,7 +112,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -120,36 +121,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   profileCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     margin: 20,
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   avatarContainer: {
     alignItems: 'center',
@@ -159,11 +162,11 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFF7F0',
+    backgroundColor: Colors.backgroundSecondary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#FF8C42',
+    borderColor: Colors.primary,
   },
   profileInfo: {
     alignItems: 'center',
@@ -171,12 +174,12 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   memberSince: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginBottom: 16,
   },
   contactInfo: {
@@ -190,33 +193,35 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginLeft: 8,
   },
   editButton: {
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
   },
   editButtonText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
     fontSize: 16,
     fontWeight: '600',
   },
   statsContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   statItem: {
     flex: 1,
@@ -225,17 +230,17 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#FF8C42',
+    color: Colors.primary,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Colors.border,
     marginHorizontal: 20,
   },
   menuSection: {
@@ -245,26 +250,28 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 16,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     padding: 16,
     borderRadius: 12,
     marginBottom: 8,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   menuIconContainer: {
     width: 40,
     height: 40,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.backgroundSecondary,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
@@ -276,12 +283,12 @@ const styles = StyleSheet.create({
   menuItemTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 2,
   },
   menuItemSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   menuChevron: {
     width: 24,
@@ -291,7 +298,7 @@ const styles = StyleSheet.create({
   },
   chevronText: {
     fontSize: 18,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   logoutSection: {
     paddingHorizontal: 20,
@@ -301,16 +308,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#DC2626',
+    borderColor: Colors.error,
   },
   logoutText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#DC2626',
+    color: Colors.error,
     marginLeft: 8,
   },
 });

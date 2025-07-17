@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ChatMessage } from '@/types/chat';
+import Colors from '@/constants/Colors';
 
 interface ChatBubbleProps {
   message: ChatMessage;
@@ -45,21 +46,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 2,
   },
   userBubble: {
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.chatUserBubble,
     borderBottomRightRadius: 4,
   },
   assistantBubble: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.chatAssistantBubble,
     borderBottomLeftRadius: 4,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: Colors.border,
   },
   text: {
     fontSize: 16,
@@ -67,21 +68,21 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   userText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   assistantText: {
-    color: '#1F2937',
+    color: Colors.text,
   },
   timestamp: {
     fontSize: 12,
     opacity: 0.7,
   },
   userTimestamp: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
     textAlign: 'right',
   },
   assistantTimestamp: {
-    color: '#6B7280',
+    color: Colors.textSecondary,
     textAlign: 'left',
   },
   cursor: {

@@ -13,6 +13,7 @@ import { ChatInput } from '@/components/chat/ChatInput';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { useChat } from '@/hooks/useChat';
 import { ChatMessage as ChatMessageType } from '@/types/chat';
+import Colors from '@/constants/Colors';
 
 export default function ChatScreen() {
   const {
@@ -115,8 +116,8 @@ export default function ChatScreen() {
           <RefreshControl
             refreshing={isLoading}
             onRefresh={refresh}
-            tintColor="#FF8C42"
-            colors={['#FF8C42']}
+            tintColor={Colors.primary}
+            colors={[Colors.primary]}
           />
         }
       />
@@ -134,25 +135,25 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: Colors.border,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#FF8C42',
+    color: Colors.primary,
     marginBottom: 4,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   messagesList: {
     flex: 1,
@@ -171,27 +172,27 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 12,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 24,
   },
   emptyHint: {
     fontSize: 14,
-    color: '#87A96B',
+    color: Colors.primary,
     textAlign: 'left',
     lineHeight: 20,
-    backgroundColor: '#F0F9FF',
+    backgroundColor: Colors.backgroundCard,
     padding: 16,
     borderRadius: 12,
     borderLeftWidth: 4,
-    borderLeftColor: '#87A96B',
+    borderLeftColor: Colors.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -200,6 +201,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
 });

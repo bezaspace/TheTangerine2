@@ -8,6 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { Send } from 'lucide-react-native';
+import Colors from '@/constants/Colors';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -40,7 +41,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           value={message}
           onChangeText={setMessage}
           placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={Colors.textMuted}
           multiline
           maxLength={1000}
           editable={!disabled}
@@ -57,7 +58,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         >
           <Send
             size={20}
-            color={!message.trim() || disabled ? '#9CA3AF' : '#FFFFFF'}
+            color={!message.trim() || disabled ? Colors.textMuted : Colors.textInverse}
           />
         </TouchableOpacity>
       </View>
@@ -67,9 +68,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: Colors.border,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -81,34 +82,35 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: Colors.border,
     borderRadius: 24,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
     maxHeight: 100,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: Colors.chatInputBackground,
     marginRight: 12,
+    color: Colors.text,
   },
   disabledInput: {
-    backgroundColor: '#F3F4F6',
-    color: '#9CA3AF',
+    backgroundColor: Colors.backgroundCard,
+    color: Colors.textMuted,
   },
   sendButton: {
-    backgroundColor: '#FF8C42',
+    backgroundColor: Colors.primary,
     width: 44,
     height: 44,
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 3,
   },
   sendButtonDisabled: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: Colors.border,
     shadowOpacity: 0,
     elevation: 0,
   },

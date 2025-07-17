@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MapPin, Star, Clock } from 'lucide-react-native';
+import Colors from '@/constants/Colors';
 
 const practitioners = [
   {
@@ -71,12 +72,12 @@ export default function HomeScreen() {
                   </View>
                   
                   <View style={styles.locationRow}>
-                    <MapPin size={14} color="#6B7280" />
+                    <MapPin size={14} color={Colors.textSecondary} />
                     <Text style={styles.location}>{practitioner.location}</Text>
                   </View>
                   
                   <View style={styles.availabilityRow}>
-                    <Clock size={14} color="#87A96B" />
+                    <Clock size={14} color={Colors.primary} />
                     <Text style={styles.nextAvailable}>{practitioner.nextAvailable}</Text>
                   </View>
                 </View>
@@ -92,7 +93,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
@@ -101,29 +102,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 30,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundSecondary,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
   welcomeText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
   appName: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#FF8C42',
+    color: Colors.primary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   section: {
@@ -133,19 +134,21 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 16,
   },
   practitionerCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.backgroundCard,
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: Colors.shadow,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   cardContent: {
     flexDirection: 'row',
@@ -157,12 +160,12 @@ const styles = StyleSheet.create({
   practitionerName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: Colors.text,
     marginBottom: 4,
   },
   specialty: {
     fontSize: 14,
-    color: '#87A96B',
+    color: Colors.primary,
     fontWeight: '500',
     marginBottom: 8,
   },
@@ -178,13 +181,13 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: 14,
-    color: '#1F2937',
+    color: Colors.text,
     fontWeight: '500',
     marginLeft: 4,
   },
   experience: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
   },
   locationRow: {
     flexDirection: 'row',
@@ -193,7 +196,7 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginLeft: 4,
   },
   availabilityRow: {
@@ -202,7 +205,7 @@ const styles = StyleSheet.create({
   },
   nextAvailable: {
     fontSize: 14,
-    color: '#87A96B',
+    color: Colors.primary,
     fontWeight: '500',
     marginLeft: 4,
   },

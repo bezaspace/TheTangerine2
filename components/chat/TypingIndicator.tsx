@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
+import Colors from '@/constants/Colors';
 
 interface TypingIndicatorProps {
   visible: boolean;
@@ -114,17 +115,19 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   bubble: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: Colors.chatAssistantBubble,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
     borderBottomLeftRadius: 4,
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   label: {
     fontSize: 14,
-    color: '#6B7280',
+    color: Colors.textSecondary,
     marginRight: 8,
   },
   dotsContainer: {
@@ -135,7 +138,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#87A96B',
+    backgroundColor: Colors.primary,
     marginHorizontal: 2,
   },
 });
