@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
 import { ChatMessage } from '@/types/chat';
 import { PractitionerResults, AvailabilityResults, BookingResults } from './results';
+import { PractitionerCard } from './PractitionerCard';
+import { TypingIndicator } from './TypingIndicator';
 import Colors from '@/constants/Colors';
 
 interface StreamingChatViewProps {
@@ -22,11 +24,36 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
     onNewSearch,
 }) => {
     const scrollViewRef = useRef<ScrollView>(null);
+    const cursorOpacity = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
         // Auto-scroll to bottom when new content arrives
         scrollViewRef.current?.scrollToEnd({ animated: true });
     }, [messages, streamingText]);
+
+    // Cursor blinking animation
+    useEffect(() => {
+        if (isStreaming) {
+            const blinkAnimation = Animated.loop(
+                Animated.sequence([
+                    Animated.timing(cursorOpacity, {
+                        toValue: 0,
+                        duration: 500,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(cursorOpacity, {
+                        toValue: 1,
+                        duration: 500,
+                        useNativeDriver: true,
+                    }),
+                ])
+            );
+            blinkAnimation.start();
+            return () => blinkAnimation.stop();
+        } else {
+            cursorOpacity.setValue(1);
+        }
+    }, [isStreaming, cursorOpacity]);
 
     const formatTime = (date: Date) => {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -47,7 +74,7 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
                     <PractitionerResults
                         practitioners={result.practitioners || result.recommendations?.map((r: any) => r.practitioner) || []}
                         searchSummary={result.searchSummary || result.overallSummary}
-                        onViewAvailability={onViewAvailability || (() => {})}
+                        onViewAvailability={onViewAvailability || (() => { })}
                     />
                 );
 
@@ -57,7 +84,7 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
                         practitioner={result.practitioner}
                         availableSlots={result.availableSlots || []}
                         message={result.message}
-                        onSlotSelect={onSlotSelect || (() => {})}
+                        onSlotSelect={onSlotSelect || (() => { })}
                     />
                 );
 
@@ -82,10 +109,60 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
         }
     };
 
+    const renderPractitionerCard = (message: ChatMessage) => {
+        if (!message.practitionerData) {
+            return null;
+        }
+
+        return (
+            <PractitionerCard
+                practitioner={message.practitionerData}
+                onPress={() => onViewAvailability?.(message.practitionerData)}
+                onBookPress={() => onViewAvailability?.(message.practitionerData)}
+                showBookButton={true}
+            />
+        );
+    };
+
     const renderMessage = (message: ChatMessage) => {
+        // Handle practitioner card display type (no header for cards)
+        if (message.displayType === 'practitioner-card') {
+            return (
+                <View key={message.id} style={styles.messageContainer}>
+                    {renderPractitionerCard(message)}
+                </View>
+            );
+        }
+
+        // Handle explanation text (special styling for explanations)
+        if (message.displayType === 'explanation-text') {
+            return (
+                <View key={message.id} style={styles.messageContainer}>
+                    <View style={styles.messageHeader}>
+                        <Text style={[styles.senderName, styles.assistantSender]}>
+                            AI Assistant
+                        </Text>
+                        <Text style={styles.timestamp}>
+                            {formatTime(message.timestamp)}
+                        </Text>
+                    </View>
+                    <View style={styles.explanationContainer}>
+                        <Text style={[styles.messageText, styles.explanationText]}>
+                            {message.content}
+                        </Text>
+                        {message.isStreaming && (
+                            <Animated.Text style={[styles.cursor, { opacity: cursorOpacity }]}>
+                                |
+                            </Animated.Text>
+                        )}
+                    </View>
+                </View>
+            );
+        }
+
         // Check if this message has function calling results or is a special display type
         const hasFunctionResults = message.functionCalls && message.functionResults;
-        const hasSpecialDisplay = message.displayType && message.displayType !== 'text';
+        const hasSpecialDisplay = message.displayType && message.displayType !== 'text' && message.displayType !== 'explanation-text';
 
         if ((hasFunctionResults || hasSpecialDisplay) && message.displayType !== 'text') {
             return (
@@ -108,6 +185,7 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
             );
         }
 
+        // Regular text messages
         return (
             <View key={message.id} style={styles.messageContainer}>
                 <View style={styles.messageHeader}>
@@ -138,9 +216,7 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
             contentContainerStyle={styles.contentContainer}
             showsVerticalScrollIndicator={false}
         >
-            {messages
-                .filter(message => !message.isStreaming) // Don't show messages that are currently streaming
-                .map(renderMessage)}
+            {messages.map(renderMessage)}
 
             {/* Streaming response */}
             {isStreaming && (
@@ -149,14 +225,22 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
                         <Text style={[styles.senderName, styles.assistantSender]}>
                             AI Assistant
                         </Text>
-                        <View style={styles.typingIndicator}>
-                            <Text style={styles.typingText}>typing...</Text>
-                        </View>
+                        <Text style={styles.timestamp}>
+                            {formatTime(new Date())}
+                        </Text>
                     </View>
-                    <Text style={[styles.messageText, styles.assistantText]}>
-                        {streamingText}
-                        <Text style={styles.cursor}>|</Text>
-                    </Text>
+                    {streamingText ? (
+                        <View style={styles.streamingTextContainer}>
+                            <Text style={[styles.messageText, styles.assistantText]}>
+                                {streamingText}
+                            </Text>
+                            <Animated.Text style={[styles.cursor, { opacity: cursorOpacity }]}>
+                                |
+                            </Animated.Text>
+                        </View>
+                    ) : (
+                        <TypingIndicator visible={true} />
+                    )}
                 </View>
             )}
         </ScrollView>
@@ -214,10 +298,16 @@ const styles = StyleSheet.create({
         color: Colors.textSecondary,
         fontStyle: 'italic',
     },
+    streamingTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+    },
     cursor: {
         color: Colors.primary,
         fontWeight: 'bold',
-        opacity: 0.8,
+        fontSize: 16,
+        lineHeight: 24,
+        marginLeft: 2,
     },
     genericResult: {
         backgroundColor: Colors.backgroundCard,
@@ -229,5 +319,14 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: Colors.textMuted,
         fontFamily: 'monospace',
+    },
+    explanationContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+    },
+    explanationText: {
+        color: Colors.text,
+        fontWeight: '400',
+        lineHeight: 26,
     },
 });

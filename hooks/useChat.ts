@@ -97,10 +97,10 @@ export const useChat = () => {
         updatedSession, 
         content.trim(),
         (chunk: string, fullText: string) => {
-          // Update state with streaming content
+          // Update state with streaming content and new messages (including practitioner cards)
           setState(prev => ({
             ...prev,
-            currentSession: updatedSession,
+            currentSession: { ...updatedSession },
           }));
           // Call the provided callback
           onStreamUpdate(chunk, fullText);
@@ -110,7 +110,7 @@ export const useChat = () => {
 
       setState(prev => ({
         ...prev,
-        currentSession: updatedSession,
+        currentSession: { ...updatedSession },
         isLoading: false,
       }));
     } catch (error: any) {

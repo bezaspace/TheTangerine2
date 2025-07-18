@@ -16,7 +16,7 @@ class GeminiService {
   private functionDeclarations = [
     {
       name: 'search_practitioners_with_recommendations',
-      description: 'Search for Ayurvedic practitioners and generate personalized recommendations with explanations. Use this when users ask to find doctors, practitioners, or book appointments.',
+      description: 'Search for Ayurvedic practitioners and generate structured alternating recommendations with explanations and practitioner cards. Use this when users ask to find doctors, practitioners, or need health guidance.',
       parameters: {
         type: Type.OBJECT,
         properties: {
@@ -55,7 +55,7 @@ class GeminiService {
           },
           limit: {
             type: Type.NUMBER,
-            description: 'Maximum number of practitioners to return (default: 5)',
+            description: 'Maximum number of practitioners to return (default: 3)',
           },
         },
         required: [],
@@ -131,13 +131,77 @@ class GeminiService {
 
   // Tool functions mapping
   private toolFunctions = {
-    search_practitioners_with_recommendations: (args: any) => this.generatePractitionerRecommendations(args),
+    search_practitioners_with_recommendations: (args: any) => this.generateAlternatingPractitionerRecommendations(args),
     check_availability: (args: any) => practitionerService.checkAvailabilityForChat(args),
     book_appointment: (args: any) => practitionerService.bookAppointmentForChat(args),
   };
 
-  // Structured output method for practitioner recommendations
-  async generatePractitionerRecommendations(args: {
+  // Streaming practitioner recommendations method
+  async *generateStreamingPractitionerRecommendations(args: {
+    query?: string;
+    specialization?: string;
+    location?: string;
+    maxFee?: number;
+    minRating?: number;
+    availableDate?: string;
+    consultationType?: 'in-person' | 'video' | 'phone';
+    language?: string;
+    limit?: number;
+  }): AsyncGenerator<string, { practitioners: any[] }, unknown> {
+    try {
+      // First, get practitioners from the service
+      const searchResult = await practitionerService.searchPractitionersForChat(args);
+      
+      if (!searchResult.practitioners || searchResult.practitioners.length === 0) {
+        yield "I couldn't find any practitioners matching your criteria. Try adjusting your search parameters.";
+        return { practitioners: [] };
+      }
+
+      // If API key is not configured, return mock streaming
+      if (!this.ai) {
+        yield* this.getMockStreamingPractitionerRecommendations(searchResult.practitioners, args.query || '');
+        return { practitioners: searchResult.practitioners };
+      }
+
+      // Create the streaming prompt for practitioner recommendations
+      const prompt = this.buildStreamingPractitionerPrompt(searchResult.practitioners, args);
+
+      // Use streaming generation
+      const response = await this.ai.models.generateContentStream({
+        model: this.defaultConfig.model,
+        contents: prompt,
+        config: {
+          systemInstruction: this.getSystemInstruction(),
+          temperature: 0.7,
+          maxOutputTokens: 2048,
+        },
+      });
+
+      for await (const chunk of response) {
+        if (chunk.text) {
+          yield chunk.text;
+        }
+      }
+
+      return { practitioners: searchResult.practitioners };
+
+    } catch (error: any) {
+      console.error('Error generating streaming practitioner recommendations:', error);
+      
+      // Fallback to basic search result
+      const searchResult = await practitionerService.searchPractitionersForChat(args);
+      yield `I found ${searchResult.practitioners.length} practitioners for you. Let me show you the recommendations:`;
+      
+      for (const practitioner of searchResult.practitioners.slice(0, 3)) {
+        yield `\n\nI recommend Dr. ${practitioner.name} because of their expertise in ${practitioner.specializations[0]} with ${practitioner.experience} years of experience and a ${practitioner.rating} star rating. [SHOW_PRACTITIONER:${practitioner.id}]`;
+      }
+      
+      return { practitioners: searchResult.practitioners };
+    }
+  }
+
+  // New structured output method for alternating practitioner recommendations
+  async generateAlternatingPractitionerRecommendations(args: {
     query?: string;
     specialization?: string;
     location?: string;
@@ -156,63 +220,21 @@ class GeminiService {
         return {
           recommendations: [],
           overallSummary: "I couldn't find any practitioners matching your criteria. Try adjusting your search parameters.",
-          totalCount: 0
+          totalCount: 0,
+          practitioners: []
         };
       }
 
-      // If API key is not configured, return mock structured recommendations
+      // If API key is not configured, return mock alternating recommendations
       if (!this.ai) {
-        return this.getMockStructuredRecommendations(searchResult.practitioners, args.query || '');
+        return this.getMockAlternatingRecommendations(searchResult.practitioners, args.query || '');
       }
 
-      // Create the structured output prompt
-      const prompt = this.buildRecommendationPrompt(searchResult.practitioners, args);
+      // Create the alternating recommendation prompt
+      const prompt = this.buildAlternatingRecommendationPrompt(searchResult.practitioners, args);
 
-      // Define the structured output schema
-      const recommendationSchema = {
-        type: Type.OBJECT,
-        properties: {
-          recommendations: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                practitionerId: {
-                  type: Type.STRING,
-                  description: 'The unique ID of the practitioner'
-                },
-                recommendationReason: {
-                  type: Type.STRING,
-                  description: 'Why this practitioner is recommended for the user'
-                },
-                matchScore: {
-                  type: Type.INTEGER,
-                  description: 'Match score from 1-10 based on user needs'
-                },
-                keyBenefits: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.STRING
-                  },
-                  description: 'Key benefits this practitioner offers'
-                },
-                personalizedNote: {
-                  type: Type.STRING,
-                  description: 'Personalized note about why this practitioner fits the user'
-                }
-              },
-              required: ['practitionerId', 'recommendationReason', 'matchScore', 'keyBenefits', 'personalizedNote'],
-              propertyOrdering: ['practitionerId', 'recommendationReason', 'matchScore', 'keyBenefits', 'personalizedNote']
-            }
-          },
-          overallSummary: {
-            type: Type.STRING,
-            description: 'Overall summary of the recommendations'
-          }
-        },
-        required: ['recommendations', 'overallSummary'],
-        propertyOrdering: ['recommendations', 'overallSummary']
-      };
+      // Import the structured schema
+      const { ALTERNATING_RECOMMENDATION_SCHEMA } = await import('@/types/structuredOutput');
 
       // Call Gemini with structured output
       const response = await this.ai.models.generateContent({
@@ -220,49 +242,44 @@ class GeminiService {
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          responseSchema: recommendationSchema,
+          responseSchema: ALTERNATING_RECOMMENDATION_SCHEMA,
           temperature: 0.7,
           maxOutputTokens: 2048,
         },
       });
 
-      const structuredData = JSON.parse(response.text);
+      const structuredData = JSON.parse(response.text || '{}');
       
-      // Combine structured recommendations with practitioner data
-      const enhancedRecommendations = structuredData.recommendations.map((rec: any) => {
-        const practitioner = searchResult.practitioners.find(p => p.id === rec.practitionerId);
-        return {
-          practitioner,
-          recommendationReason: rec.recommendationReason,
-          matchScore: rec.matchScore,
-          keyBenefits: rec.keyBenefits,
-          personalizedNote: rec.personalizedNote
-        };
-      }).filter((rec: any) => rec.practitioner); // Filter out any missing practitioners
-
       return {
-        recommendations: enhancedRecommendations,
+        structuredData,
+        practitioners: searchResult.practitioners,
         overallSummary: structuredData.overallSummary,
-        totalCount: enhancedRecommendations.length
+        totalCount: searchResult.practitioners.length
       };
 
     } catch (error: any) {
-      console.error('Error generating practitioner recommendations:', error);
+      console.error('Error generating alternating practitioner recommendations:', error);
       
-      // Fallback to basic search result
+      // Fallback to mock alternating recommendations
       const searchResult = await practitionerService.searchPractitionersForChat(args);
-      return {
-        recommendations: searchResult.practitioners.map(practitioner => ({
-          practitioner,
-          recommendationReason: 'Matches your search criteria',
-          matchScore: 7,
-          keyBenefits: practitioner.specializations.slice(0, 2),
-          personalizedNote: `Dr. ${practitioner.name} has ${practitioner.experience} years of experience and specializes in ${practitioner.specializations[0]}.`
-        })),
-        overallSummary: searchResult.searchSummary,
-        totalCount: searchResult.practitioners.length
-      };
+      return this.getMockAlternatingRecommendations(searchResult.practitioners, args.query || '');
     }
+  }
+
+  // Legacy method for backward compatibility
+  async generatePractitionerRecommendations(args: {
+    query?: string;
+    specialization?: string;
+    location?: string;
+    maxFee?: number;
+    minRating?: number;
+    availableDate?: string;
+    consultationType?: 'in-person' | 'video' | 'phone';
+    language?: string;
+    limit?: number;
+  }) {
+    // Redirect to new alternating method
+    return this.generateAlternatingPractitionerRecommendations(args);
   }
 
   private buildRecommendationPrompt(practitioners: any[], args: any): string {
@@ -292,6 +309,68 @@ For each practitioner, provide:
 Also provide an overall summary of the recommendations.`;
   }
 
+  private getMockAlternatingRecommendations(practitioners: any[], query: string) {
+    const selectedPractitioners = practitioners.slice(0, 3);
+    const recommendations = [];
+    
+    // Create alternating pattern: explanation -> practitioner-card -> explanation -> practitioner-card
+    selectedPractitioners.forEach((practitioner, index) => {
+      // Add explanation
+      recommendations.push({
+        type: 'explanation',
+        explanation: `I highly recommend Dr. ${practitioner.name} for your ${query}. With ${practitioner.experience} years of specialized experience in ${practitioner.specializations[0]}, they have an excellent ${practitioner.rating}-star rating from ${practitioner.reviewCount} patients. Their expertise in ${practitioner.specializations.slice(0, 2).join(' and ')} makes them particularly well-suited for your needs.`
+      });
+      
+      // Add practitioner card
+      recommendations.push({
+        type: 'practitioner-card',
+        practitionerId: practitioner.id,
+        recommendationReason: `Excellent match for ${query} with specialized expertise in ${practitioner.specializations[0]}`,
+        keyBenefits: practitioner.specializations.slice(0, 2),
+        matchScore: 9 - index
+      });
+    });
+
+    return {
+      structuredData: {
+        recommendations,
+        overallSummary: `I found ${selectedPractitioners.length} excellent practitioners who are well-suited for your needs. Each has been carefully selected based on their specializations and experience.`
+      },
+      practitioners: selectedPractitioners,
+      overallSummary: `I found ${selectedPractitioners.length} excellent practitioners who are well-suited for your needs.`,
+      totalCount: selectedPractitioners.length
+    };
+  }
+
+  private buildAlternatingRecommendationPrompt(practitioners: any[], args: any): string {
+    const userQuery = args.query || 'finding a suitable Ayurvedic practitioner';
+    const practitionerList = practitioners.map(p => 
+      `ID: ${p.id}, Name: ${p.name}, Specializations: ${p.specializations.join(', ')}, Experience: ${p.experience} years, Rating: ${p.rating}, Location: ${p.location}, Fee: ${p.consultationFee}, Languages: ${p.languages.join(', ')}`
+    ).join('\n');
+
+    return `You are an expert Ayurvedic wellness advisor. A user is looking for help with: "${userQuery}"
+
+Here are the available practitioners:
+${practitionerList}
+
+Create an alternating sequence of explanations and practitioner cards. For each practitioner you recommend:
+
+1. First, create an "explanation" entry with detailed reasoning why you recommend them
+2. Then, create a "practitioner-card" entry with their ID and structured recommendation data
+
+The pattern should be: explanation -> practitioner-card -> explanation -> practitioner-card
+
+Focus on:
+- How their specializations match the user's needs
+- Their experience and qualifications  
+- Why they're a good fit for the specific health concerns
+- Their location and availability advantages
+- Match score based on suitability (1-10)
+- Key benefits they offer
+
+Limit to top 3 practitioners and provide an overall summary.`;
+  }
+
   private getMockStructuredRecommendations(practitioners: any[], query: string) {
     const mockRecommendations = practitioners.slice(0, 3).map((practitioner, index) => ({
       practitioner,
@@ -306,6 +385,63 @@ Also provide an overall summary of the recommendations.`;
       overallSummary: `I found ${mockRecommendations.length} excellent practitioners who are well-suited for your needs. Each has been carefully selected based on their specializations and experience.`,
       totalCount: mockRecommendations.length
     };
+  }
+
+  private buildStreamingPractitionerPrompt(practitioners: any[], args: any): string {
+    const userQuery = args.query || 'finding a suitable Ayurvedic practitioner';
+    const practitionerList = practitioners.map(p => 
+      `ID: ${p.id}, Name: ${p.name}, Specializations: ${p.specializations.join(', ')}, Experience: ${p.experience} years, Rating: ${p.rating}, Location: ${p.location}, Fee: ${p.consultationFee}, Languages: ${p.languages.join(', ')}`
+    ).join('\n');
+
+    return `You are an expert Ayurvedic wellness advisor. A user is looking for help with: "${userQuery}"
+
+Here are the available practitioners:
+${practitionerList}
+
+Please provide personalized recommendations for each practitioner. For each practitioner, write a detailed explanation of why you recommend them, then add the marker [SHOW_PRACTITIONER:practitioner_id] to display their card.
+
+Format your response like this:
+- Start with a brief introduction
+- For each practitioner, provide a detailed explanation of why they're recommended
+- Immediately after each explanation, add [SHOW_PRACTITIONER:their_id]
+- Continue with the next practitioner
+
+Focus on:
+- How their specializations match the user's needs
+- Their experience and qualifications
+- Why they're a good fit for the specific health concerns
+- Their location and availability advantages
+
+Keep explanations conversational and helpful.`;
+  }
+
+  private async *getMockStreamingPractitionerRecommendations(practitioners: any[], query: string): AsyncGenerator<string, void, unknown> {
+    const selectedPractitioners = practitioners.slice(0, 3);
+    
+    yield "I found some excellent Ayurvedic practitioners for you! Let me share my personalized recommendations:\n\n";
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    for (let i = 0; i < selectedPractitioners.length; i++) {
+      const practitioner = selectedPractitioners[i];
+      
+      const explanation = `I highly recommend Dr. ${practitioner.name} for your ${query}. With ${practitioner.experience} years of specialized experience in ${practitioner.specializations[0]}, they have an excellent ${practitioner.rating}-star rating from ${practitioner.reviewCount} patients. Their expertise in ${practitioner.specializations.slice(0, 2).join(' and ')} makes them particularly well-suited for your needs. Located in ${practitioner.location}, they offer consultations at $${practitioner.consultationFee} and speak ${practitioner.languages.join(', ')}.`;
+      
+      // Stream the explanation word by word
+      const words = explanation.split(' ');
+      for (let j = 0; j < words.length; j++) {
+        await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 100));
+        yield words.slice(0, j + 1).join(' ');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 300));
+      yield explanation + ` [SHOW_PRACTITIONER:${practitioner.id}]`;
+      
+      if (i < selectedPractitioners.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        yield explanation + ` [SHOW_PRACTITIONER:${practitioner.id}]\n\n`;
+      }
+    }
   }
 
   constructor() {
@@ -448,6 +584,44 @@ Respond in a friendly, knowledgeable tone that reflects the app's focus on natur
     } catch (error: any) {
       console.error('Gemini Streaming Error:', error);
       throw new Error(error.message || 'Streaming failed');
+    }
+  }
+
+  // Method for streaming messages using chat functionality
+  async *sendMessageStream(message: string): AsyncGenerator<string, void, unknown> {
+    if (!this.ai) {
+      // Mock streaming for demo
+      const mockResponse = await this.getMockResponse(message);
+      const words = mockResponse.text.split(' ');
+
+      for (let i = 0; i < words.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
+        yield words.slice(0, i + 1).join(' ');
+      }
+      return;
+    }
+
+    try {
+      if (!this.chat) {
+        // Initialize chat if not already done
+        this.initializeChat();
+      }
+
+      const response = await this.chat.sendMessageStream({
+        message: message,
+      });
+
+      let fullText = '';
+      for await (const chunk of response) {
+        if (chunk.text) {
+          fullText += chunk.text;
+          yield fullText;
+        }
+      }
+    } catch (error: any) {
+      console.error('Gemini Chat Streaming Error:', error);
+      // Fallback to regular streaming
+      yield* this.generateStreamResponse(message);
     }
   }
 
@@ -732,40 +906,7 @@ Respond in a friendly, knowledgeable tone that reflects the app's focus on natur
     }
   }
 
-  // Send message with streaming using native chat API
-  async *sendMessageStream(message: string): AsyncGenerator<string, void, unknown> {
-    // Mock streaming when API key is not configured
-    if (!this.ai || !this.chat) {
-      const mockResponse = await this.getMockResponse(message);
-      const words = mockResponse.text.split(' ');
 
-      for (let i = 0; i < words.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
-        // Yield incremental chunks (like real Gemini streaming)
-        if (i === 0) {
-          yield words[i];
-        } else {
-          yield ' ' + words[i];
-        }
-      }
-      return;
-    }
-
-    try {
-      const stream = await this.chat.sendMessageStream({
-        message: message,
-      });
-
-      for await (const chunk of stream) {
-        if (chunk.text) {
-          yield chunk.text;
-        }
-      }
-    } catch (error: any) {
-      console.error('Chat streaming error:', error);
-      throw new Error(error.message || 'Chat streaming failed');
-    }
-  }
 
   // Send regular message using native chat API
   async sendMessage(message: string): Promise<GeminiResponse> {
