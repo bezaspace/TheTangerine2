@@ -11,6 +11,12 @@ export interface ChatMessage {
   }>;
   functionResults?: any[];
   displayType?: 'text' | 'practitioner-suggestions' | 'practitioner-recommendations' | 'booking-confirmation' | 'availability-check';
+  // Interaction context for multi-step flows
+  interactionContext?: {
+    selectedPractitioner?: any;
+    selectedSlot?: any;
+    bookingStep?: 'search' | 'availability' | 'booking' | 'confirmation';
+  };
 }
 
 export interface ChatSession {

@@ -177,6 +177,80 @@ export const useChat = () => {
     }
   }, [state.currentSession, state.sessions]);
 
+  const selectPractitioner = useCallback(async (practitioner: any) => {
+    if (!state.currentSession) return;
+
+    // Create a message to check availability for the selected practitioner
+    const availabilityMessage = `Check availability for Dr. ${practitioner.name} (ID: ${practitioner.id})`;
+    
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const updatedSession = { ...state.currentSession };
+      
+      await chatService.sendMessageWithStreaming(
+        updatedSession,
+        availabilityMessage,
+        (chunk: string, fullText: string) => {
+          setState(prev => ({
+            ...prev,
+            currentSession: updatedSession,
+          }));
+        },
+        { enableFunctionCalling: true }
+      );
+
+      setState(prev => ({
+        ...prev,
+        currentSession: updatedSession,
+        isLoading: false,
+      }));
+    } catch (error: any) {
+      setState(prev => ({
+        ...prev,
+        error: error.message,
+        isLoading: false,
+      }));
+    }
+  }, [state.currentSession]);
+
+  const selectSlot = useCallback(async (practitioner: any, slot: any) => {
+    if (!state.currentSession) return;
+
+    // For now, we'll create a booking message - in a real app, you might show a form first
+    const bookingMessage = `Book appointment with Dr. ${practitioner.name} (ID: ${practitioner.id}) for slot ${slot.id} on ${slot.date} at ${slot.startTime}. Patient details: John Doe, john@example.com, +1234567890, consultation type: ${slot.consultationType}`;
+    
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const updatedSession = { ...state.currentSession };
+      
+      await chatService.sendMessageWithStreaming(
+        updatedSession,
+        bookingMessage,
+        (chunk: string, fullText: string) => {
+          setState(prev => ({
+            ...prev,
+            currentSession: updatedSession,
+          }));
+        },
+        { enableFunctionCalling: true }
+      );
+
+      setState(prev => ({
+        ...prev,
+        currentSession: updatedSession,
+        isLoading: false,
+      }));
+    } catch (error: any) {
+      setState(prev => ({
+        ...prev,
+        error: error.message,
+        isLoading: false,
+      }));
+    }
+  }, [state.currentSession]);
+
   const clearError = useCallback(() => {
     setState(prev => ({ ...prev, error: null }));
   }, []);
@@ -185,6 +259,8 @@ export const useChat = () => {
     ...state,
     sendMessage,
     sendMessageWithStreaming,
+    selectPractitioner,
+    selectSlot,
     createNewSession,
     switchToSession,
     deleteSession,

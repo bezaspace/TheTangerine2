@@ -62,7 +62,7 @@ export const PractitionerCard: React.FC<PractitionerCardProps> = ({
           <MapPin size={14} color={Colors.textMuted} />
           <Text style={styles.detailText}>{practitioner.location}</Text>
         </View>
-        
+
         <View style={styles.detailRow}>
           <DollarSign size={14} color={Colors.textMuted} />
           <Text style={styles.detailText}>${practitioner.consultationFee} consultation</Text>

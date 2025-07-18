@@ -68,13 +68,9 @@ export interface CheckAvailabilityResult {
   message: string;
 }
 
-// Enhanced chat message types with function calls
-export interface FunctionCallMessage {
-  id: string;
-  role: 'assistant';
-  timestamp: Date;
-  functionCall: FunctionCall;
-  functionResult?: any;
-  displayComponent: 'practitioner-suggestions' | 'booking-confirmation' | 'availability-check';
-  isStreaming?: boolean;
+// Enhanced interaction types for multi-step booking flow
+export interface InteractionContext {
+  selectedPractitioner?: any;
+  selectedSlot?: any;
+  bookingStep?: 'search' | 'availability' | 'booking' | 'confirmation';
 }

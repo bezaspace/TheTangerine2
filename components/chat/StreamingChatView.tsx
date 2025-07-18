@@ -1,23 +1,25 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { ChatMessage } from '@/types/chat';
-import { FunctionCallMessage } from './FunctionCallMessage';
+import { PractitionerResults, AvailabilityResults, BookingResults } from './results';
 import Colors from '@/constants/Colors';
 
 interface StreamingChatViewProps {
     messages: ChatMessage[];
     isStreaming: boolean;
     streamingText: string;
-    onPractitionerPress?: (practitioner: any) => void;
-    onBookPress?: (practitioner: any) => void;
+    onViewAvailability?: (practitioner: any) => void;
+    onSlotSelect?: (practitioner: any, slot: any) => void;
+    onNewSearch?: () => void;
 }
 
 export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
     messages,
     isStreaming,
     streamingText,
-    onPractitionerPress,
-    onBookPress,
+    onViewAvailability,
+    onSlotSelect,
+    onNewSearch,
 }) => {
     const scrollViewRef = useRef<ScrollView>(null);
 
@@ -28,6 +30,56 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
 
     const formatTime = (date: Date) => {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const renderFunctionResult = (message: ChatMessage) => {
+        if (!message.functionResults || message.functionResults.length === 0) {
+            return null;
+        }
+
+        const result = message.functionResults[0];
+        const functionName = message.functionCalls?.[0]?.name;
+
+        switch (functionName) {
+            case 'search_practitioners':
+            case 'search_practitioners_with_recommendations':
+                return (
+                    <PractitionerResults
+                        practitioners={result.practitioners || result.recommendations?.map((r: any) => r.practitioner) || []}
+                        searchSummary={result.searchSummary || result.overallSummary}
+                        onViewAvailability={onViewAvailability || (() => {})}
+                    />
+                );
+
+            case 'check_availability':
+                return (
+                    <AvailabilityResults
+                        practitioner={result.practitioner}
+                        availableSlots={result.availableSlots || []}
+                        message={result.message}
+                        onSlotSelect={onSlotSelect || (() => {})}
+                    />
+                );
+
+            case 'book_appointment':
+                return (
+                    <BookingResults
+                        booking={result.booking}
+                        success={result.success}
+                        message={result.message}
+                        onNewSearch={onNewSearch}
+                    />
+                );
+
+            default:
+                return (
+                    <View style={styles.genericResult}>
+                        <Text style={styles.genericResultText}>
+                            {JSON.stringify(result, null, 2)}
+                        </Text>
+                    </View>
+                );
+        }
     };
 
     const renderMessage = (message: ChatMessage) => {
@@ -46,11 +98,12 @@ export const StreamingChatView: React.FC<StreamingChatViewProps> = ({
                             {formatTime(message.timestamp)}
                         </Text>
                     </View>
-                    <FunctionCallMessage
-                        message={message}
-                        onPractitionerPress={onPractitionerPress}
-                        onBookPress={onBookPress}
-                    />
+                    {message.content && (
+                        <Text style={[styles.messageText, styles.assistantText]}>
+                            {message.content}
+                        </Text>
+                    )}
+                    {renderFunctionResult(message)}
                 </View>
             );
         }
@@ -165,5 +218,16 @@ const styles = StyleSheet.create({
         color: Colors.primary,
         fontWeight: 'bold',
         opacity: 0.8,
+    },
+    genericResult: {
+        backgroundColor: Colors.backgroundCard,
+        borderRadius: 8,
+        padding: 12,
+        marginTop: 8,
+    },
+    genericResultText: {
+        fontSize: 12,
+        color: Colors.textMuted,
+        fontFamily: 'monospace',
     },
 });

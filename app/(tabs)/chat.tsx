@@ -19,6 +19,8 @@ export default function ChatScreen() {
     isLoading,
     error,
     sendMessageWithStreaming,
+    selectPractitioner,
+    selectSlot,
     clearError,
     refresh,
   } = useChat();
@@ -72,28 +74,18 @@ export default function ChatScreen() {
     }
   };
 
-  const handlePractitionerPress = (practitioner: any) => {
-    // Handle practitioner selection - could navigate to practitioner details
-    console.log('Practitioner selected:', practitioner);
+  const handleViewAvailability = async (practitioner: any) => {
+    console.log('Viewing availability for:', practitioner.name);
+    await selectPractitioner(practitioner);
   };
 
-  const handleBookPress = (practitioner: any) => {
-    // Handle booking request - could open booking interface
-    console.log('Book appointment with:', practitioner);
-    Alert.alert(
-      'Book Appointment',
-      `Would you like to book an appointment with ${practitioner.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Book Now', 
-          onPress: () => {
-            // For now, just send a message to the chat
-            handleSendMessage(`I want to book an appointment with ${practitioner.name}`);
-          }
-        },
-      ]
-    );
+  const handleSlotSelect = async (practitioner: any, slot: any) => {
+    console.log('Slot selected:', slot, 'for practitioner:', practitioner.name);
+    await selectSlot(practitioner, slot);
+  };
+
+  const handleNewSearch = () => {
+    handleSendMessage('Find me more practitioners');
   };
 
   const renderEmptyState = () => (
@@ -145,8 +137,9 @@ export default function ChatScreen() {
           messages={currentSession.messages}
           isStreaming={isStreaming}
           streamingText={streamingText}
-          onPractitionerPress={handlePractitionerPress}
-          onBookPress={handleBookPress}
+          onViewAvailability={handleViewAvailability}
+          onSlotSelect={handleSlotSelect}
+          onNewSearch={handleNewSearch}
         />
       )}
       
